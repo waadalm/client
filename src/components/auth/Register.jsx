@@ -1,43 +1,54 @@
 import React, { Component } from "react";
 import api from "../../utils/api";
-api;
-
 export default class Register extends Component {
   constructor() {
     //to give a call to the base class constructor
     super();
 
-    //state: its an object from the base class i.e. Component class to hold the data for our component.
+    //state: its an object from the base class i.e Component class to hold the data for our component.
     this.state = {
       name: "",
       email: "",
       password: "",
       confirmPassword: "",
+      errors: [],
     };
   }
 
   onChange = (e) => {
-    //we need to collect the data for every change field.
-    // we need to update the state accordingly.
-    // e: event
-    //target: location where the event happened
-    //value: whatever the input that we peovided it will give is that data.
-    // name : name field value of the input tag.
-    //console.log(e.target.value);
-    //console.log(e.target.name);
-
-    //set state
     this.setState({ [e.target.name]: e.target.value });
-    //end state, data, headers.
-    api.post("/users", this.state);
+    // we need to collect data for every changed field
+    // we need toupdate the state accordingly
+    //console.log(e.target.value);
+    //e: event
+    //target: locationwhere event happend
+    //value: whatever the input that we provided it will give us the data
+
+    //console.log(e.target.name);
+    // name field value of the input tag
   };
+
   onSubmit = (e) => {
     e.preventDefault();
     console.log(this.state);
+
+    api
+      .post("/users", this.state)
+      .then((res) => console.log(res.data))
+      .catch((err) => {
+        this.setState({ ["errors"]: err.response.data.errors });
+      });
+    //then: to handle the success part
+    //catch: to handle the error part
+    // end point: /users
+    // data: this.state
+    // header specification: already added in api.js, optional for us bcz of api.js work
   };
+
   render() {
-    //destructuring the state object.
+    //destructuring the state object
     const { name, email, password, confirmPassword } = this.state;
+
     return (
       <>
         <section class="container">
@@ -51,11 +62,14 @@ export default class Register extends Component {
                 type="text"
                 placeholder="Enter the Name"
                 name="name"
-                required
                 value={name}
                 onChange={this.onChange}
               />
             </div>
+            <div className="d-block invalid-feedback">
+              {this.state.errors.length != 0 && this.state.errors[0].msg}
+            </div>
+
             <div class="form-group">
               <input
                 type="email"
@@ -64,10 +78,9 @@ export default class Register extends Component {
                 value={email}
                 onChange={this.onChange}
               />
-              <small>
-                This site uses Gravatar so if you want a profile image, use a
-                Gravatar email
-              </small>
+            </div>
+            <div className="d-block invalid-feedback">
+              {this.state.errors.length != 0 && this.state.errors[1].msg}
             </div>
             <div class="form-group">
               <input
@@ -78,6 +91,9 @@ export default class Register extends Component {
                 onChange={this.onChange}
               />
             </div>
+            <div className="d-block invalid-feedback">
+              {this.state.errors.length != 0 && this.state.errors[2].msg}
+            </div>
             <div class="form-group">
               <input
                 type="password"
@@ -87,6 +103,7 @@ export default class Register extends Component {
                 onChange={this.onChange}
               />
             </div>
+
             <div class="form-group">
               <input type="submit" class="btn btn-primary" value="Register" />
             </div>
